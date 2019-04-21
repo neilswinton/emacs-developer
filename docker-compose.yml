@@ -1,0 +1,14 @@
+version: '2.1'
+
+services:
+  emacs-developer:
+    image: emacs-developer
+    build: .
+    expose:
+      - 2375  # Host docker daemon
+      - 6000  # X-Windows display :0
+    volumes:
+      - developer_home:/home
+volumes:
+  developer_home:
+    external: false
