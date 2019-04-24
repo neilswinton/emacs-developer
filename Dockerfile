@@ -1,7 +1,17 @@
 FROM ubuntu:18.04
 
+ARG BUILD_DATE
+ARG VCS_REF
+
 # Open X-Windows ports
 EXPOSE 6000-6010
+
+# Open docker network port to use docker client on Windows
+EXPOSE 2375 
+
+LABEL   org.label-schema.build-date=$BUILD_DATE \
+        org.label-schema.vcs-url="https://github.com/neilswinton/emacs-developer" \
+        org.label-schema.vcs-ref=$VCS_REF
 
 # Install pre-reqs to docker install plus tools
 RUN apt -y update && apt -y install \
