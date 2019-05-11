@@ -24,7 +24,7 @@ First, create a volume for /home:
 
 Then run the container using that volume:
 
-`docker run -v devhome:/home --expose 6000 --expose 2375 emacs-developer`
+`docker run --detach --volume devhome:/home --expose 6000 --expose 2375 neilswinton/emacs-developer`
 
 You can use the docker-compose.yml to make this all easier and more automatic
 for a single instance.
@@ -56,10 +56,12 @@ commands, check the following:
 1. Docker setting "Expose daemon on tcp://localhost:2375 without TLS" is true
 2. Your .profile contains `export DOCKER_HOST=host.docker.internal:2375`
 
+### Docker Commands on a Linux Host
 I'll check the setup for Linux next time I'm running docker on Linux.  In
-general, you'll run using `docker run -v devhome:/home -v
-/var/run/docker.sock:/var/run/docker.sock --expose 6000 emacs-developer` and
-that second volume mount will give the container access to the Docker daemon.
+general, you can access docker by mapping the docker socket from the Linux host
+directly into the container as shown below:
+
+`docker run --detach --volume /var/run/docker.sock:/var/run/docker.sock --volume devhome:/home --expose 6000 --expose 2375 neilswinton/emacs-developer`
 
 
 
