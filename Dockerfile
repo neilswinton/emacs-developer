@@ -58,6 +58,9 @@ RUN curl -sL "https://github.com/docker/compose/releases/download/$(curl -s http
 
 RUN curl --silent --location --fail https://manpages.ubuntu.com/dman > /usr/bin/dman && chmod 555 /usr/bin/dman && echo '(setq manual-program "dman")' >> /etc/skel/.emacs
 
+# Make python point to python3
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
 ENV developer="developer"
 RUN echo '%sudo  ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 RUN useradd  -ms /bin/bash $developer && usermod -aG sudo $developer
