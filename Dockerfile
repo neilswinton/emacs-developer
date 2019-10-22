@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:19.04
 
 # Open X-Windows ports
 EXPOSE 6000-6010
@@ -19,11 +19,14 @@ RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb
 
 # Add Docker package repository for docker commands
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 # Add Google Cloud repo to package sources for kubectl
 RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
     echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+
+# Get the latest git
+RUN apt-add-repository ppa:git-core/ppa
 
 # Add docker, emacs, Azure CLI, Python
 RUN apt -y update && \
@@ -39,12 +42,13 @@ RUN apt -y update && \
     make \
     man-db \
     net-tools \
-    python-pip \
+    python3-pip \
     software-properties-common \
     sudo \
     sudo \
     tzdata \
-    wget 
+    wget \
+    zip
 
 # Remove the install info in a seperate step so adding extras doesn't cost much time
 RUN rm -rf /var/lib/apt/lists/*
