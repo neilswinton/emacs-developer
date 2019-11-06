@@ -7,10 +7,12 @@ EXPOSE 6000-6010
 EXPOSE 2375 
 
 # Install packages needed for adding more package repositories
-RUN apt -y update && apt -y install \
-    apt-transport-https \
-    curl \
-    software-properties-common
+RUN apt -y update \
+    && apt -y install \
+        apt-transport-https \
+        curl \
+        software-properties-common \
+    && (yes | unminimize )
 
 # Add Microsoft Azure CLI package repo for az command
 RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | \
