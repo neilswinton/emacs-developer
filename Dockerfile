@@ -30,6 +30,10 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
 # Get the latest git
 RUN apt-add-repository ppa:git-core/ppa
 
+# Add Google Cloud repo to package sources for kubectl
+RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+
 # Add docker, emacs, Azure CLI, Python
 RUN apt -y update && \
     DEBIAN_FRONTEND=noninteractive apt -y install \
