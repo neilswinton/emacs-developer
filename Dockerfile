@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:19.04
 
 # Open X-Windows ports
 EXPOSE 6000-6010
@@ -7,10 +7,12 @@ EXPOSE 6000-6010
 EXPOSE 2375 
 
 # Install packages needed for adding more package repositories
-RUN apt -y update && apt -y install \
-    apt-transport-https \
-    curl \
-    software-properties-common
+RUN apt -y update \
+    && apt -y install \
+        apt-transport-https \
+        curl \
+        software-properties-common \
+    && (yes | unminimize )
 
 # Add Microsoft Azure CLI package repo for az command
 RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | \
@@ -19,7 +21,14 @@ RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb
 
 # Add Docker package repository for docker commands
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+# Add Google Cloud repo to package sources for kubectl
+RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+
+# Get the latest git
+RUN apt-add-repository ppa:git-core/ppa
 
 # Add Google Cloud repo to package sources for kubectl
 RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
@@ -39,12 +48,13 @@ RUN apt -y update && \
     make \
     man-db \
     net-tools \
-    python-pip \
+    python3-pip \
     software-properties-common \
     sudo \
     sudo \
     tzdata \
-    wget 
+    wget \
+    zip
 
 # Remove the install info in a seperate step so adding extras doesn't cost much time
 RUN rm -rf /var/lib/apt/lists/*
@@ -53,6 +63,9 @@ RUN rm -rf /var/lib/apt/lists/*
 RUN curl -sL "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
 
 RUN curl --silent --location --fail https://manpages.ubuntu.com/dman > /usr/bin/dman && chmod 555 /usr/bin/dman && echo '(setq manual-program "dman")' >> /etc/skel/.emacs
+
+# Make python point to python3
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 ENV developer="developer"
 RUN echo '%sudo  ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
