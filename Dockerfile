@@ -1,4 +1,4 @@
-FROM ubuntu:19.04
+FROM ubuntu:19.10
 
 # Open X-Windows ports
 EXPOSE 6000-6010
@@ -43,6 +43,7 @@ RUN apt -y update && \
     emacs \
     git \
     iputils-ping \
+    ispell \
     jq \
     kubectl \
     make \
@@ -50,7 +51,6 @@ RUN apt -y update && \
     net-tools \
     python3-pip \
     software-properties-common \
-    sudo \
     sudo \
     tzdata \
     wget \
@@ -80,6 +80,7 @@ CMD DISPLAY=host.docker.internal:0 bash -l -c emacs
 # These change on every build -- don't bust the caching
 ARG BUILD_DATE
 ARG VCS_REF
+ARG VCS_URL
 
 LABEL   org.label-schema.build-date=$BUILD_DATE \
         org.label-schema.vcs-url="https://github.com/neilswinton/emacs-developer" \
