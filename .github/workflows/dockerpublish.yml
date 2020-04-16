@@ -8,7 +8,7 @@ on:
 
     # Publish `v1.2.3` tags as releases.
     tags:
-      - v*
+      - releases/*
 
   # Run tests for any PRs.
   pull_request:
@@ -75,9 +75,12 @@ jobs:
           # Use Docker `latest` tag convention
           [ "$VERSION" == "master" ] && VERSION=latest
 
+          # Remove leading releases/ from tag
+          [[ $VERSION =~ ^releases/* ]] && VERSION="$(basename $VERSION)"
+
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
-          echo ${{ github.run_number }}
+          echo run_github.number=${{ github.run_number }}
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION

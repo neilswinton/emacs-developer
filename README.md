@@ -1,3 +1,4 @@
+![Docker](https://github.com/neilswinton/emacs-developer/workflows/Docker/badge.svg)
 [![](https://images.microbadger.com/badges/image/neilswinton/emacs-developer.svg)](https://microbadger.com/images/neilswinton/emacs-developer
 "Get your own image badge on microbadger.com")
 [![](https://images.microbadger.com/badges/version/neilswinton/emacs-developer.svg)](https://microbadger.com/images/neilswinton/emacs-developer
