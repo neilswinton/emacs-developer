@@ -54,7 +54,7 @@ jobs:
           docker build . --file Dockerfile --tag image          \
                 --build-arg BUILD_DATE="$(NOW)"                 \
                 --build-arg VCS_REF="${{ github.sha }}"         \
-                --build-arg VCS_URL=""${{ github.repository }}"
+                --build-arg VCS_URL="${{ github.repository }}"
 
 
       - name: Log into registry
