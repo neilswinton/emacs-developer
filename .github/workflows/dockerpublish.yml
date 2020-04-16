@@ -48,15 +48,21 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build image
-        run: docker build . --file Dockerfile --tag image
+        run: |
+          NOW="$(date --iso-8601=seconds)"
+          echo "::set-env name=NOW::$NOW"
+          docker build . --file Dockerfile --tag image          \
+                --build-arg BUILD_DATE="$(NOW)"                 \
+                --build-arg VCS_REF="${{ github.sha }}"         \
+                --build-arg VCS_URL=""${{ github.repository }}"
+
 
       - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.REPOSITORY_PASSWORD }}" | docker login ${{ secrets.REGISTRY }} -u ${{ secrets.REPOSITORY_USER }} --password-stdin
 
       - name: Push image
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-          
+          IMAGE_ID=${{ secrets.REGISTRY }}/${{ secrets.REPOSITORY_NAME }}/$IMAGE_NAME
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
 
@@ -71,6 +77,8 @@ jobs:
 
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
+          echo ${{ github.run_number }}
 
           docker tag image $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+          echo ${{ env.NOW }}
