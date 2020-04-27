@@ -1,4 +1,4 @@
-FROM ubuntu:19.10
+FROM ubuntu:20.04
 
 # Open X-Windows ports
 EXPOSE 6000-6010
@@ -15,13 +15,9 @@ RUN apt -y update \
     && (yes | unminimize )
 
 # Add Microsoft Azure CLI package repo for az command
-RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | \
-    tee /etc/apt/sources.list.d/azure-cli.list && \
-    curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-
-# Add Docker package repository for docker commands
-RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add - && \
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+# RUN echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | \
+#     tee /etc/apt/sources.list.d/azure-cli.list && \
+#     curl -L https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
 
 # Add Google Cloud repo to package sources for kubectl
 RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
@@ -37,9 +33,8 @@ RUN curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add 
 # Add docker, emacs, Azure CLI, Python
 RUN apt -y update && \
     DEBIAN_FRONTEND=noninteractive apt -y install \
-    azure-cli \
     dnsutils \
-    docker-ce \
+    docker.io \
     emacs \
     git \
     iputils-ping \
@@ -48,6 +43,7 @@ RUN apt -y update && \
     kubectl \
     make \
     man-db \
+    meld \
     net-tools \
     python3-pip \
     software-properties-common \
@@ -56,8 +52,12 @@ RUN apt -y update && \
     wget \
     zip
 
+
 # Remove the install info in a seperate step so adding extras doesn't cost much time
-RUN rm -rf /var/lib/apt/lists/*
+#RUN rm -rf /var/lib/apt/lists/*
+
+# Install Azure CLI -- until it's in Ubuntu 20.04 -- package was azure-cli 
+# curl -L https://aka.ms/InstallAzureCli | bash
 
 # Install docker-compose
 RUN curl -sL "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
@@ -66,6 +66,9 @@ RUN curl --silent --location --fail https://manpages.ubuntu.com/dman > /usr/bin/
 
 # Make python point to python3
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+
+RUN pip3 install pipenv
 
 ENV developer="developer"
 RUN echo '%sudo  ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
