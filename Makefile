@@ -1,5 +1,5 @@
 NOW:="$(shell date --iso-8601=seconds)"
-TAG:="$(shell git branch --show-current | sed 's|/|-|g')"
+TAG:="$(shell git branch --show-current | sed 's|/|-|g' | sed 's/^master/latest/')"
 REPO:="$(shell basename `git rev-parse --show-toplevel`)"
 
 build:
