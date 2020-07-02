@@ -40,6 +40,7 @@ RUN apt -y update &&                              \
     ispell                                        \
     jq                                            \
     kubectl                                       \
+    locales                                       \
     make                                          \
     man-db                                        \
     meld                                          \
@@ -54,21 +55,29 @@ RUN apt -y update &&                              \
 
 RUN DEBIAN_FRONTEND=noninteractive apt -y install docker-compose
 
-# Remove the install info in a seperate step so adding extras doesn't cost much time
-#RUN rm -rf /var/lib/apt/lists/*
-
 # Install dman 
 RUN curl --silent --location --fail https://manpages.ubuntu.com/dman > /usr/bin/dman && chmod 555 /usr/bin/dman && echo '(setq manual-program "dman")' >> /etc/skel/.emacs
 
 # Make python point to python3
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
-RUN update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
+    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
 
 RUN pip3 install pipenv
 
+# Set the locale to UTF-8
+RUN locale-gen en_US.UTF-8  
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8  
 ENV developer="developer"
+
 RUN echo '%sudo  ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 RUN useradd  -ms /bin/bash $developer && usermod -aG sudo $developer
+
+Remove the install info in a seperate step so adding extras doesn't cost much time
+RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get clean
+
 
 VOLUME /home
 WORKDIR /home/$developer
